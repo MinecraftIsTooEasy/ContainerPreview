@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "containerpreview",
+  "version": "${version}",
+  "depends": {
+    "fishmodloader": ">=3.2.1"
+  },
+  "environment": "*",
+  "name": "Container Preview",
+  "description": "",
+  "authors": [
+    "Debris"
+  ],
+  "entrypoints": {
+    "main": [
+      "com.github.FlyBird.containerpreview.ContainerPreview"
+    ]
+  },
+  "mixins": [
+    "hellofml.mixins.json"
+  ],
+  "accessWidener": "containerpreview.accesswidener"
+}
