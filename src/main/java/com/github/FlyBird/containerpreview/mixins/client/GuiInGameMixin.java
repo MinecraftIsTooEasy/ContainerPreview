@@ -1,4 +1,4 @@
-package com.github.FlyBird.containerpreview.mixins;
+package com.github.FlyBird.containerpreview.mixins.client;
 
 import com.github.FlyBird.containerpreview.PreviewGui;
 import net.minecraft.*;

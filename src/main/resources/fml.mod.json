@@ -24,7 +24,7 @@
     "com.github.FlyBird.containerpreview.compat.ModMenuImpl"
   ],
   "mixins": [
-    "hellofml.mixins.json"
+    "containerpreview.mixins.json"
   ],
   "accessWidener": "containerpreview.accesswidener"
 }
