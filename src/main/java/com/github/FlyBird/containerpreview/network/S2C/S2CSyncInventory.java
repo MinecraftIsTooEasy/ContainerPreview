@@ -12,6 +12,7 @@ import net.minecraft.ResourceLocation;
 import java.io.IOException;
 
 public class S2CSyncInventory implements Packet {
+
     private final int x;
     private final int y;
     private final int z;
@@ -25,13 +26,15 @@ public class S2CSyncInventory implements Packet {
         this.slotCount = Math.max(0, sourceInventory.getSizeInventory());
         this.syncedItems = new ItemStack[this.slotCount];
 
-        for (int i = 0; i < this.slotCount; i++) {
+        for (int i = 0; i < this.slotCount; i++)
+        {
             ItemStack stack = sourceInventory.getStackInSlot(i);
             this.syncedItems[i] = stack == null ? null : stack.copy();
         }
     }
 
-    public S2CSyncInventory(PacketByteBuf packetByteBuf) {
+    public S2CSyncInventory(PacketByteBuf packetByteBuf)
+    {
         this.x = packetByteBuf.readInt();
         this.y = packetByteBuf.readInt();
         this.z = packetByteBuf.readInt();
@@ -39,46 +42,63 @@ public class S2CSyncInventory implements Packet {
         int parsedSlotCount;
         boolean useLegacyLayout = false;
         packetByteBuf.getInputStream().mark(4);
-        try {
+
+        try
+        {
             parsedSlotCount = packetByteBuf.readInt();
-            if (parsedSlotCount <= 0 || parsedSlotCount > 4096) {
+
+            if (parsedSlotCount <= 0 || parsedSlotCount > 4096)
+            {
                 useLegacyLayout = true;
                 parsedSlotCount = 27;
             }
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException runtimeException)
+        {
             useLegacyLayout = true;
             parsedSlotCount = 27;
         }
 
-        if (useLegacyLayout) {
-            try {
+        if (useLegacyLayout)
+        {
+            try
+            {
                 packetByteBuf.getInputStream().reset();
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to reset packet stream for legacy inventory preview format", e);
+            }
+            catch (IOException ioException)
+            {
+                throw new RuntimeException("Failed to reset packet stream for legacy inventory preview format", ioException);
             }
         }
 
         this.slotCount = parsedSlotCount;
         this.syncedItems = new ItemStack[this.slotCount];
-        for (int i = 0; i < this.slotCount; i++) {
+
+        for (int i = 0; i < this.slotCount; i++)
+        {
             this.syncedItems[i] = packetByteBuf.readItemStack();
         }
     }
 
     @Override
-    public void write(PacketByteBuf packetByteBuf) {
+    public void write(PacketByteBuf packetByteBuf)
+    {
         packetByteBuf.writeInt(this.x);
         packetByteBuf.writeInt(this.y);
         packetByteBuf.writeInt(this.z);
         packetByteBuf.writeInt(this.slotCount);
-        for (int i = 0; i < this.slotCount; i++) {
+
+        for (int i = 0; i < this.slotCount; i++)
+        {
             packetByteBuf.writeItemStack(this.syncedItems[i]);
         }
     }
 
     @Override
-    public void apply(EntityPlayer entityPlayer) {
-        if (entityPlayer.worldObj.isRemote) {
+    public void apply(EntityPlayer entityPlayer)
+    {
+        if (entityPlayer.worldObj.isRemote)
+        {
             C2SGetInventory.setInventory(this.x, this.y, this.z, this.syncedItems);
         }
     }

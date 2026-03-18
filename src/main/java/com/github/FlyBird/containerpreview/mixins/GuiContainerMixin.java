@@ -1,8 +1,8 @@
 package com.github.FlyBird.containerpreview.mixins;
 
 import com.github.FlyBird.containerpreview.PreviewGui;
-import com.github.FlyBird.containerpreview.compat.Backpack;
-import com.github.FlyBird.containerpreview.compat.ShulkerBox;
+import com.github.FlyBird.containerpreview.compat.BackpackImpl;
+import com.github.FlyBird.containerpreview.compat.ShulkerBoxImpl;
 import com.github.FlyBird.containerpreview.network.C2S.C2SInform;
 import moddedmite.rustedironcore.network.Network;
 import net.minecraft.*;
@@ -16,49 +16,65 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiContainer.class)
 public class GuiContainerMixin {
-    @Shadow
-    private Slot theSlot;
+
+    @Shadow private Slot theSlot;
 
     @Unique
     private boolean requestedEnderPreview;
 
-    @Inject(method = {"drawScreen"}, at = {@At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glPopMatrix()V")})
-    private void renderItem(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glPopMatrix()V"))
+    private void renderItem(int mouseX, int mouseY, float partialTicks, CallbackInfo ci)
+    {
         ItemStack stack = this.theSlot == null ? null : this.theSlot.getStack();
-        if (stack == null || !(GuiScreen.isCtrlKeyDown() || GuiScreen.isShiftKeyDown())) {
+
+        if (stack == null || !(GuiScreen.isCtrlKeyDown() || GuiScreen.isShiftKeyDown()))
+        {
             requestedEnderPreview = false;
             return;
         }
 
         ItemStack[] previewStacks = null;
 
-        if (FishModLoader.hasMod("shulkerbox")) {
-            for (int i = 0; i < 16; i++) {
-                if (stack.itemID == ShulkerBox.getShulkerBoxID() + i) {
-                    previewStacks = ShulkerBox.getItemsFromItemStack(stack);
+        if (FishModLoader.hasMod("shulkerbox"))
+        {
+            for (int i = 0; i < 16; i++)
+            {
+                if (stack.itemID == ShulkerBoxImpl.getShulkerBoxID() + i)
+                {
+                    previewStacks = ShulkerBoxImpl.getItemsFromItemStack(stack);
                     break;
                 }
             }
         }
-        if (previewStacks == null && FishModLoader.hasMod("backpack") && stack.itemID == Backpack.getBackpackID()) {
-            previewStacks = Backpack.getItemStackfromNBT(stack);
+
+        if (previewStacks == null && FishModLoader.hasMod("backpack") && stack.itemID == BackpackImpl.getBackpackID())
+        {
+            previewStacks = BackpackImpl.getItemStackfromNBT(stack);
         }
 
-        if (stack.itemID == Block.enderChest.blockID) {
+        if (stack.itemID == Block.enderChest.blockID)
+        {
             InventoryEnderChest inventory = C2SInform.getInventoryEnderChest();
-            if (inventory == null && !requestedEnderPreview) {
+
+            if (inventory == null && !requestedEnderPreview)
+            {
                 Network.sendToServer(new C2SInform());
                 requestedEnderPreview = true;
             }
-            if (inventory != null) {
+
+            if (inventory != null)
+            {
                 requestedEnderPreview = false;
                 previewStacks = PreviewGui.snapshot(inventory);
             }
-        } else {
+        }
+        else
+        {
             requestedEnderPreview = false;
         }
 
-        if (previewStacks == null || previewStacks.length == 0) {
+        if (previewStacks == null || previewStacks.length == 0)
+        {
             return;
         }
 

@@ -8,22 +8,21 @@ import moddedmite.rustedironcore.network.Network;
 import net.minecraft.*;
 
 public class C2SInform implements Packet {
+
     private static InventoryEnderChest inventoryEnderChest;
 
-    public C2SInform() {
-    }
+    public C2SInform() {}
 
-    public C2SInform(PacketByteBuf packetByteBuf) {
-    }
+    public C2SInform(PacketByteBuf packetByteBuf) {}
 
     @Override
-    public void write(PacketByteBuf packetByteBuf) {
-
-    }
+    public void write(PacketByteBuf packetByteBuf) {}
 
     @Override
-    public void apply(EntityPlayer player) {
-        if (!player.worldObj.isRemote) {
+    public void apply(EntityPlayer player)
+    {
+        if (!player.worldObj.isRemote)
+        {
             inventoryEnderChest = player.getInventoryEnderChest();
             Network.sendToClient((ServerPlayer) player, new S2CSyncEnderChest(inventoryEnderChest));
         }
@@ -33,15 +32,19 @@ public class C2SInform implements Packet {
         return inventoryEnderChest;
     }
 
-    public static void setInventoryEnderChest(ItemStack[] syncedItems) {
-        if (syncedItems == null) {
+    public static void setInventoryEnderChest(ItemStack[] syncedItems)
+    {
+        if (syncedItems == null)
+        {
             inventoryEnderChest = null;
             return;
         }
 
         InventoryEnderChest synced = new InventoryEnderChest();
         int limit = Math.min(synced.getSizeInventory(), syncedItems.length);
-        for (int i = 0; i < limit; i++) {
+
+        for (int i = 0; i < limit; i++)
+        {
             synced.setInventorySlotContents(i, syncedItems[i]);
         }
         inventoryEnderChest = synced;

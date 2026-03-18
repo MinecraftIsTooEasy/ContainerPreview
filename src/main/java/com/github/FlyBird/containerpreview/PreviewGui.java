@@ -10,12 +10,13 @@ import org.lwjgl.opengl.GL11;
 public class PreviewGui extends GuiScreen {
 
     private static final ResourceLocation SLOT_TEXTURE = new ResourceLocation("containerpreview:textures/gui/container/slot.png");
+
     private static final int SLOT_SIZE = 18;
     private static final int MAX_COLUMNS = 19;
     private static final int PADDING = 4;
-    private static final float PREVIEW_SCALE = 0.5F;
 
     private boolean isSendPacket;
+
     public static int x;
     public static int y;
     public static int z;
@@ -24,27 +25,39 @@ public class PreviewGui extends GuiScreen {
 
     public PreviewGui() {}
 
-    public static ItemStack[] snapshot(IInventory inventory) {
+    public static ItemStack[] snapshot(IInventory inventory)
+    {
         int size = Math.max(0, inventory.getSizeInventory());
         ItemStack[] snapshot = new ItemStack[size];
-        for (int i = 0; i < size; i++) {
+
+        for (int i = 0; i < size; i++)
+        {
             ItemStack stack = inventory.getStackInSlot(i);
             snapshot[i] = stack == null ? null : stack.copy();
         }
+
         return snapshot;
     }
 
-    public static int getPreviewColumns(int slotCount) {
-        if (slotCount <= 0) {
+    public static int getPreviewColumns(int slotCount)
+    {
+        if (slotCount <= 0)
+        {
             return 0;
         }
-        if (slotCount <= 9) {
+
+        if (slotCount <= 9)
+        {
             return slotCount;
         }
-        if (slotCount % 9 == 0 && slotCount <= 54) {
+
+        if (slotCount % 9 == 0 && slotCount <= 54)
+        {
             return 9;
         }
-        if (slotCount % 19 == 0) {
+
+        if (slotCount % 19 == 0)
+        {
             return 19;
         }
 
@@ -52,11 +65,15 @@ public class PreviewGui extends GuiScreen {
         return Math.max(1, Math.min(MAX_COLUMNS, columns));
     }
 
-    public static int getPreviewRows(int slotCount) {
+    public static int getPreviewRows(int slotCount)
+    {
         int columns = getPreviewColumns(slotCount);
-        if (columns <= 0) {
+
+        if (columns <= 0)
+        {
             return 0;
         }
+
         return (slotCount + columns - 1) / columns;
     }
 
@@ -69,11 +86,11 @@ public class PreviewGui extends GuiScreen {
     }
 
     public static int getScaledPreviewWidth(int slotCount) {
-        return Math.round(getPreviewWidth(slotCount) * PREVIEW_SCALE);
+        return Math.round(getPreviewWidth(slotCount) * CPConfigs.getPreviewScale());
     }
 
     public static int getScaledPreviewHeight(int slotCount) {
-        return Math.round(getPreviewHeight(slotCount) * PREVIEW_SCALE);
+        return Math.round(getPreviewHeight(slotCount) * CPConfigs.getPreviewScale());
     }
 
     private void drawSlot(int x, int y) {
@@ -86,10 +103,13 @@ public class PreviewGui extends GuiScreen {
         tessellator.draw();
     }
 
-    public void drawBackground(int x, int y, int slotCount) {
+    public void drawBackground(int x, int y, int slotCount)
+    {
         int columns = getPreviewColumns(slotCount);
         int rows = getPreviewRows(slotCount);
-        if (columns <= 0 || rows <= 0) {
+
+        if (columns <= 0 || rows <= 0)
+        {
             return;
         }
 
@@ -98,8 +118,10 @@ public class PreviewGui extends GuiScreen {
         float previousZ = this.zLevel;
         this.zLevel = 300.0f;
 
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < columns; col++) {
+        for (int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col < columns; col++)
+            {
                 this.drawSlot(x + col * SLOT_SIZE, y + row * SLOT_SIZE);
             }
         }
@@ -111,15 +133,21 @@ public class PreviewGui extends GuiScreen {
         drawBackground(x, y, 27);
     }
 
-    public void drawItems(int x, int y, ItemStack[] itemStacks) {
-        if (itemStacks == null || itemStacks.length == 0) {
+    public void drawItems(int x, int y, ItemStack[] itemStacks)
+    {
+        if (itemStacks == null || itemStacks.length == 0)
+        {
             return;
         }
 
         int columns = getPreviewColumns(itemStacks.length);
-        for (int i = 0; i < itemStacks.length; i++) {
+
+        for (int i = 0; i < itemStacks.length; i++)
+        {
             ItemStack stack = itemStacks[i];
-            if (stack != null) {
+
+            if (stack != null)
+            {
                 int row = i / columns;
                 int col = i % columns;
                 drawItemStack(stack, x + col * SLOT_SIZE + 1, y + row * SLOT_SIZE + 1);
@@ -127,20 +155,24 @@ public class PreviewGui extends GuiScreen {
         }
     }
 
-    public void drawPreview(int x, int y, ItemStack[] itemStacks) {
-        if (itemStacks == null || itemStacks.length == 0) {
+    public void drawPreview(int x, int y, ItemStack[] itemStacks)
+    {
+        if (itemStacks == null || itemStacks.length == 0)
+        {
             return;
         }
 
         GL11.glPushMatrix();
         GL11.glTranslatef(x, y, 0.0F);
-        GL11.glScalef(PREVIEW_SCALE, PREVIEW_SCALE, 1.0F);
+        float previewScale = CPConfigs.getPreviewScale();
+        GL11.glScalef(previewScale, previewScale, 1.0F);
         drawBackground(0, 0, itemStacks.length);
         drawItems(0, 0, itemStacks);
         GL11.glPopMatrix();
     }
 
-    private void drawItemStack(ItemStack stack, int x, int y) {
+    private void drawItemStack(ItemStack stack, int x, int y)
+    {
         GL11.glDisable(32826);
         RenderHelper.disableStandardItemLighting();
         GL11.glDisable(2896);
@@ -165,60 +197,85 @@ public class PreviewGui extends GuiScreen {
         GL11.glPopMatrix();
     }
 
-    public final void renderAll() {
-        if (!(Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU))) {
+    public final void renderAll()
+    {
+        if (!(Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU)))
+        {
             return;
         }
 
-        RaycastCollision rc = Minecraft.getMinecraft().objectMouseOver;
-        if (rc == null || !rc.isBlock()) {
+        RaycastCollision raycastCollision = Minecraft.getMinecraft().objectMouseOver;
+
+        if (raycastCollision == null || !raycastCollision.isBlock())
+        {
             return;
         }
 
-        Block block = rc.getBlockHit();
-        if (!block.hasTileEntity()) {
+        Block block = raycastCollision.getBlockHit();
+
+        if (!block.hasTileEntity())
+        {
             return;
         }
 
         ItemStack[] chestContents = null;
-        TileEntity tileEntity = rc.world.getBlockTileEntity(rc.block_hit_x, rc.block_hit_y, rc.block_hit_z);
-        if (tileEntity instanceof IInventory) {
-            if (x != rc.block_hit_x || y != rc.block_hit_y || z != rc.block_hit_z) {
-                x = rc.block_hit_x;
-                y = rc.block_hit_y;
-                z = rc.block_hit_z;
+        TileEntity tileEntity = raycastCollision.world.getBlockTileEntity(raycastCollision.block_hit_x, raycastCollision.block_hit_y, raycastCollision.block_hit_z);
+
+        if (tileEntity instanceof IInventory)
+        {
+            if (x != raycastCollision.block_hit_x || y != raycastCollision.block_hit_y || z != raycastCollision.block_hit_z)
+            {
+                x = raycastCollision.block_hit_x;
+                y = raycastCollision.block_hit_y;
+                z = raycastCollision.block_hit_z;
                 isSendPacket = true;
-            } else {
+            }
+            else
+            {
                 isSendPacket = false;
             }
-            if (isSendPacket) {
-                Network.sendToServer(new C2SGetInventory(rc.block_hit_x, rc.block_hit_y, rc.block_hit_z));
+
+            if (isSendPacket)
+            {
+                Network.sendToServer(new C2SGetInventory(raycastCollision.block_hit_x, raycastCollision.block_hit_y, raycastCollision.block_hit_z));
             }
 
-            IInventory inventory = C2SGetInventory.getInventory(rc.block_hit_x, rc.block_hit_y, rc.block_hit_z);
-            if (inventory != null) {
-                chestContents = snapshot(inventory);
-            }
-        } else if (block instanceof BlockEnderChest) {
-            if (x != rc.block_hit_x || y != rc.block_hit_y || z != rc.block_hit_z) {
-                x = rc.block_hit_x;
-                y = rc.block_hit_y;
-                z = rc.block_hit_z;
-                isSendPacket = true;
-            } else {
-                isSendPacket = false;
-            }
-            if (isSendPacket) {
-                Network.sendToServer(new C2SInform());
-            }
+            IInventory inventory = C2SGetInventory.getInventory(raycastCollision.block_hit_x, raycastCollision.block_hit_y, raycastCollision.block_hit_z);
 
-            IInventory inventory = C2SInform.getInventoryEnderChest();
-            if (inventory != null) {
+            if (inventory != null)
+            {
                 chestContents = snapshot(inventory);
             }
         }
 
-        if (chestContents == null || chestContents.length == 0) {
+        else if (block instanceof BlockEnderChest)
+        {
+            if (x != raycastCollision.block_hit_x || y != raycastCollision.block_hit_y || z != raycastCollision.block_hit_z)
+            {
+                x = raycastCollision.block_hit_x;
+                y = raycastCollision.block_hit_y;
+                z = raycastCollision.block_hit_z;
+                isSendPacket = true;
+            }
+            else
+            {
+                isSendPacket = false;
+            }
+
+            if (isSendPacket)
+            {
+                Network.sendToServer(new C2SInform());
+            }
+            IInventory inventory = C2SInform.getInventoryEnderChest();
+
+            if (inventory != null)
+            {
+                chestContents = snapshot(inventory);
+            }
+        }
+
+        if (chestContents == null || chestContents.length == 0)
+        {
             return;
         }
 

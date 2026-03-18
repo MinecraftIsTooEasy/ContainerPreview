@@ -11,9 +11,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InventoryEnderChest.class)
 public class InventoryEnderChestMixin {
-    @Inject(method = "closeChest",at ={@At(value = "HEAD")})
-    public void closeChest(CallbackInfo ci){
-        if (FabricUtil.isServer()) {
+
+    @Inject(method = "closeChest", at = @At(value = "HEAD"))
+    public void closeChest(CallbackInfo ci)
+    {
+        if (FabricUtil.isServer())
+        {
             return;
         }
         Network.sendToServer(new C2SInform());
