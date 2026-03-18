@@ -13,7 +13,7 @@
   ],
   "entrypoints": {
     "main": [
-      "com.github.FlyBird.containerpreview.ContainerPreview"
+      "com.github.FlyBird.containerpreview.ContainerPreviewMod"
     ]
   },
   "mixins": [

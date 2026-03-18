@@ -9,10 +9,11 @@ import net.minecraft.ResourceLocation;
 import net.xiaoyu233.fml.FishModLoader;
 
 public class Packets {
-  public static final ResourceLocation Inform = new ResourceLocation("Preview", "Inform");
-  public static final ResourceLocation GetInventory = new ResourceLocation("Preview", "GetInventory");
-  public static final ResourceLocation SyncInventory = new ResourceLocation("Preview", "SyncInventory");
-  public static final ResourceLocation SyncEnderChest = new ResourceLocation("Preview", "SyncEnderChest");
+
+  public static final ResourceLocation Inform = new ResourceLocation("containerpreview", "Inform");
+  public static final ResourceLocation GetInventory = new ResourceLocation("containerpreview", "GetInventory");
+  public static final ResourceLocation SyncInventory = new ResourceLocation("containerpreview", "SyncInventory");
+  public static final ResourceLocation SyncEnderChest = new ResourceLocation("containerpreview", "SyncEnderChest");
 
   public static void init() {
     if (!FishModLoader.isServer()) {

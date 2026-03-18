@@ -7,12 +7,13 @@ import net.xiaoyu233.fml.ModResourceManager;
 import net.xiaoyu233.fml.reload.event.MITEEvents;
 
 public class ContainerPreviewMod implements ModInitializer {
-    public static final String MOD_ID = "preview";
+
+    public static final String MOD_ID = "containerpreview";
 
     @Override
-    public void onInitialize() {   //相当于main函数，万物起源
+    public void onInitialize() {
         ModResourceManager.addResourcePackDomain(MOD_ID);
-        MITEEvents.MITE_EVENT_BUS.register(new CPFMLEvents());//注册一个事件监听类
+        MITEEvents.MITE_EVENT_BUS.register(new CPFMLEvents());
         Packets.init();
     }
 }

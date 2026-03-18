@@ -34,8 +34,14 @@ public class C2SInform implements Packet {
     }
 
     public static void setInventoryEnderChest(ItemStack[] syncedItems) {
+        if (syncedItems == null) {
+            inventoryEnderChest = null;
+            return;
+        }
+
         InventoryEnderChest synced = new InventoryEnderChest();
-        for (int i = 0; i < Math.min(27, syncedItems.length); i++) {
+        int limit = Math.min(synced.getSizeInventory(), syncedItems.length);
+        for (int i = 0; i < limit; i++) {
             synced.setInventorySlotContents(i, syncedItems[i]);
         }
         inventoryEnderChest = synced;

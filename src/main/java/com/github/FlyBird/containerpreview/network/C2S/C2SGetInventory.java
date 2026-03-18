@@ -41,12 +41,20 @@ public class C2SGetInventory implements Packet {
             return;
         }
 
-        TileEntity tileEntity = entityPlayer.worldObj.getBlockTileEntity(x, y, z);
+        World world = entityPlayer.worldObj;
+        int blockId = world.getBlockId(x, y, z);
+        Block block = Block.blocksList[blockId];
+
+        if (block instanceof BlockChest chestBlock) {
+            IInventory mergedChest = chestBlock.getInventory(world, x, y, z);
+            if (mergedChest != null) {
+                Network.sendToClient((ServerPlayer) entityPlayer, new S2CSyncInventory(x, y, z, mergedChest));
+            }
+            return;
+        }
+
+        TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
         if (tileEntity instanceof IInventory target) {
-            inventory = target;
-            inventoryX = x;
-            inventoryY = y;
-            inventoryZ = z;
             Network.sendToClient((ServerPlayer) entityPlayer, new S2CSyncInventory(x, y, z, target));
         }
     }
@@ -59,8 +67,14 @@ public class C2SGetInventory implements Packet {
     }
 
     public static void setInventory(int x, int y, int z, ItemStack[] syncedItems) {
-        InventoryBasic synced = new InventoryBasic("preview_remote_inventory", true, 27);
-        for (int i = 0; i < Math.min(27, syncedItems.length); i++) {
+        if (syncedItems == null) {
+            inventory = null;
+            return;
+        }
+
+        int size = Math.max(0, syncedItems.length);
+        InventoryBasic synced = new InventoryBasic("preview_remote_inventory", true, size);
+        for (int i = 0; i < size; i++) {
             synced.setInventorySlotContents(i, syncedItems[i]);
         }
 

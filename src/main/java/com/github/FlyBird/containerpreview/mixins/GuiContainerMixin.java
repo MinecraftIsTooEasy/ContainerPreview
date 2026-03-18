@@ -20,71 +20,58 @@ public class GuiContainerMixin {
     private Slot theSlot;
 
     @Unique
-    private boolean flag;
-
-    @Unique
     private boolean requestedEnderPreview;
 
     @Inject(method = {"drawScreen"}, at = {@At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glPopMatrix()V")})
-    private void renderItem(int par1, int par2, float par3, CallbackInfo ci) {
+    private void renderItem(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         ItemStack stack = this.theSlot == null ? null : this.theSlot.getStack();
-        if (stack == null || stack.itemID != Block.enderChest.blockID) {
+        if (stack == null || !(GuiScreen.isCtrlKeyDown() || GuiScreen.isShiftKeyDown())) {
+            requestedEnderPreview = false;
+            return;
+        }
+
+        ItemStack[] previewStacks = null;
+
+        if (FishModLoader.hasMod("shulkerbox")) {
+            for (int i = 0; i < 16; i++) {
+                if (stack.itemID == ShulkerBox.getShulkerBoxID() + i) {
+                    previewStacks = ShulkerBox.getItemsFromItemStack(stack);
+                    break;
+                }
+            }
+        }
+        if (previewStacks == null && FishModLoader.hasMod("backpack") && stack.itemID == Backpack.getBackpackID()) {
+            previewStacks = Backpack.getItemStackfromNBT(stack);
+        }
+
+        if (stack.itemID == Block.enderChest.blockID) {
+            InventoryEnderChest inventory = C2SInform.getInventoryEnderChest();
+            if (inventory == null && !requestedEnderPreview) {
+                Network.sendToServer(new C2SInform());
+                requestedEnderPreview = true;
+            }
+            if (inventory != null) {
+                requestedEnderPreview = false;
+                previewStacks = PreviewGui.snapshot(inventory);
+            }
+        } else {
             requestedEnderPreview = false;
         }
 
-        if (stack != null&&(GuiScreen.isCtrlKeyDown()||GuiScreen.isShiftKeyDown())) {
-            flag = false;
-            ItemStack[] chestContents = new ItemStack[27];
-            if (FishModLoader.hasMod("shulkerbox")) {
-                for (int i = 0; i < 16; i++) {
-                    if (stack.itemID == ShulkerBox.getShulkerBoxID() + i) {
-                        this.flag = true;
-                        chestContents = ShulkerBox.getItemsFromItemStack(stack);
-                        break;
-                    }
-                }
-            }
-            if (FishModLoader.hasMod("backpack")) {
-                if (stack.itemID == Backpack.getBackpackID()) {
-                    this.flag = true;
-                    chestContents = Backpack.getItemStackfromNBT(stack);
-                }
-            }
-            if (stack.itemID == Block.enderChest.blockID) {
-                InventoryEnderChest inventory = C2SInform.getInventoryEnderChest();
-                if (inventory == null && !requestedEnderPreview) {
-                    Network.sendToServer(new C2SInform());
-                    requestedEnderPreview = true;
-                }
-                if (inventory != null) {
-                    requestedEnderPreview = false;
-                    for (int i = 0; i < 27; i++) {
-                        if (chestContents != null) {
-                            chestContents[i] = inventory.getStackInSlot(i);
-                        }
-                    }
-                }
-                flag = true;
-            }
-            for (int i = 0; i < 27; i++) {
-                if(chestContents == null){
-                    flag = false;
-                    break;
-                }
-                if (chestContents[i] == null) {
-                    flag = false;
-                }
-                if (chestContents[i] != null) {
-                    flag = true;
-                    break;
-                }
-            }
-
-            if (flag) {
-                PreviewGui previewGui = new PreviewGui();
-                previewGui.drawBackground(par1 - 115, par2 - 140);
-                previewGui.drawItems(par1 - 115, par2 - 140, chestContents);
-            }
+        if (previewStacks == null || previewStacks.length == 0) {
+            return;
         }
+
+        ScaledResolution scaled = new ScaledResolution(Minecraft.getMinecraft().gameSettings, Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
+        int width = PreviewGui.getScaledPreviewWidth(previewStacks.length);
+        int height = PreviewGui.getScaledPreviewHeight(previewStacks.length);
+
+        int drawX = mouseX - width - 10;
+        int drawY = mouseY - height / 2;
+        drawX = Math.max(4, Math.min(drawX, scaled.getScaledWidth() - width - 4));
+        drawY = Math.max(4, Math.min(drawY, scaled.getScaledHeight() - height - 4));
+
+        PreviewGui previewGui = new PreviewGui();
+        previewGui.drawPreview(drawX, drawY, previewStacks);
     }
 }
