@@ -3,7 +3,8 @@ package com.github.FlyBird.containerpreview.mixins;
 import com.github.FlyBird.containerpreview.PreviewGui;
 import com.github.FlyBird.containerpreview.compat.Backpack;
 import com.github.FlyBird.containerpreview.compat.ShulkerBox;
-import com.github.FlyBird.containerpreview.network.C2SInform;
+import com.github.FlyBird.containerpreview.network.C2S.C2SInform;
+import moddedmite.rustedironcore.network.Network;
 import net.minecraft.*;
 import net.xiaoyu233.fml.FishModLoader;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,9 +22,15 @@ public class GuiContainerMixin {
     @Unique
     private boolean flag;
 
+    @Unique
+    private boolean requestedEnderPreview;
+
     @Inject(method = {"drawScreen"}, at = {@At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glPopMatrix()V")})
     private void renderItem(int par1, int par2, float par3, CallbackInfo ci) {
         ItemStack stack = this.theSlot == null ? null : this.theSlot.getStack();
+        if (stack == null || stack.itemID != Block.enderChest.blockID) {
+            requestedEnderPreview = false;
+        }
 
         if (stack != null&&(GuiScreen.isCtrlKeyDown()||GuiScreen.isShiftKeyDown())) {
             flag = false;
@@ -45,7 +52,12 @@ public class GuiContainerMixin {
             }
             if (stack.itemID == Block.enderChest.blockID) {
                 InventoryEnderChest inventory = C2SInform.getInventoryEnderChest();
+                if (inventory == null && !requestedEnderPreview) {
+                    Network.sendToServer(new C2SInform());
+                    requestedEnderPreview = true;
+                }
                 if (inventory != null) {
+                    requestedEnderPreview = false;
                     for (int i = 0; i < 27; i++) {
                         if (chestContents != null) {
                             chestContents[i] = inventory.getStackInSlot(i);

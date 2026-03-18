@@ -1,6 +1,7 @@
 package com.github.FlyBird.containerpreview.mixins;
 
-import com.github.FlyBird.containerpreview.network.C2SInform;
+import com.github.FlyBird.containerpreview.network.C2S.C2SInform;
+import moddedmite.rustedironcore.api.util.FabricUtil;
 import moddedmite.rustedironcore.network.Network;
 import net.minecraft.TileEntityChest;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class TileEntityChestMixin {
     @Inject(method = "closeChest",at ={@At(value = "HEAD")})
     public void closeChest(CallbackInfo ci){
+        if (FabricUtil.isServer()) {
+            return;
+        }
         Network.sendToServer(new C2SInform());
 
     }

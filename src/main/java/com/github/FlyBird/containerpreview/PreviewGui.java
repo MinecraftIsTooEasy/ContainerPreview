@@ -1,26 +1,17 @@
 package com.github.FlyBird.containerpreview;
 
-import com.github.FlyBird.containerpreview.compat.Backpack;
-import com.github.FlyBird.containerpreview.network.C2SGetInventory;
-import com.github.FlyBird.containerpreview.network.C2SInform;
-import com.github.flybird.backpack.block.BlockBackpack;
-import com.github.flybird.backpack.tileentity.TileEntityBackpack;
-import limingzxc.shulkerbox.block.BlockShulkerBox;
-import limingzxc.shulkerbox.tileentity.TileEntityShulkerBox;
+import com.github.FlyBird.containerpreview.network.C2S.C2SGetInventory;
+import com.github.FlyBird.containerpreview.network.C2S.C2SInform;
 import moddedmite.rustedironcore.network.Network;
 import net.minecraft.*;
-import net.xiaoyu233.fml.FishModLoader;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL12.GL_RESCALE_NORMAL;
 
 public class PreviewGui extends GuiScreen {
     protected static final ResourceLocation background = new ResourceLocation("preview:textures/gui/container/preview.png");
     private  boolean isSendPacket;
     public static int x,y,z;
+
     /**
      * Stacks renderer. Icons, stack size, health, etc...
      */
@@ -98,7 +89,7 @@ public class PreviewGui extends GuiScreen {
                         if (isSendPacket) {
                             Network.sendToServer(new C2SGetInventory(rc.block_hit_x, rc.block_hit_y, rc.block_hit_z));
                         }
-                        IInventory inventory = C2SGetInventory.inventory;
+                        IInventory inventory = C2SGetInventory.getInventory(rc.block_hit_x, rc.block_hit_y, rc.block_hit_z);
 
                         if(inventory != null) {
                             isContainer = true;
@@ -107,6 +98,17 @@ public class PreviewGui extends GuiScreen {
                             }
                         }
                     } else if (block instanceof BlockEnderChest) {
+                        if (x != rc.block_hit_x || y != rc.block_hit_y || z != rc.block_hit_z) {
+                            x = rc.block_hit_x;
+                            y = rc.block_hit_y;
+                            z = rc.block_hit_z;
+                            isSendPacket = true;
+                        } else {
+                            isSendPacket = false;
+                        }
+                        if (isSendPacket) {
+                            Network.sendToServer(new C2SInform());
+                        }
                         IInventory inventory = C2SInform.getInventoryEnderChest();
                         if(inventory != null) {
                             isContainer = true;

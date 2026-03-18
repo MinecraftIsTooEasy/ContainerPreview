@@ -36,6 +36,7 @@ dependencies {
     implementation "com.github.MinecraftIsTooEasy:Gson:2.10.1"
 
     implementation "com.github.MinecraftIsTooEasy:Backpack:1.2.1"
+    implementation "com.github.MinecraftIsTooEasy:UtilityCraft:1.0.6"
     implementation "com.github.MinecraftIsTooEasy:ShulkerBox:1.1.3"
 }
 
