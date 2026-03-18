@@ -113,7 +113,9 @@ public class PreviewGui extends GuiScreen {
             return;
         }
 
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, CPConfigs.getPreviewAlpha());
         Minecraft.getMinecraft().getTextureManager().bindTexture(SLOT_TEXTURE);
         float previousZ = this.zLevel;
         this.zLevel = 300.0f;
@@ -127,6 +129,8 @@ public class PreviewGui extends GuiScreen {
         }
 
         this.zLevel = previousZ;
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     public void drawBackground(int x, int y) {

@@ -12,6 +12,8 @@ public class CPConfigs extends SimpleConfigs {
 
     public static final ConfigDouble previewScale = new ConfigDouble("containerpreview.previewScale", 1.0D, 0.5D, 4.0D, "containerpreview.previewScale");
 
+    public static final ConfigDouble previewAlpha = new ConfigDouble("containerpreview.previewAlpha", 1.0D, 0.05D, 1.0D, "containerpreview.previewAlpha");
+
     private static final CPConfigs INSTANCE;
 
     public static final List<ConfigBase<?>> MiscSettings;
@@ -31,15 +33,20 @@ public class CPConfigs extends SimpleConfigs {
         return INSTANCE;
     }
 
-    public static float getPreviewScale()
-    {
+    public static float getPreviewScale() {
         double value = previewScale.getDoubleValue();
-
-        if (Double.isNaN(value) || Double.isInfinite(value))
-        {
-            return 0.5F;
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            return 1.0F;
         }
         return (float) Math.max(0.1D, value);
+    }
+
+    public static float getPreviewAlpha() {
+        double value = previewAlpha.getDoubleValue();
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            return 1.0F;
+        }
+        return (float) Math.max(0.0D, Math.min(1.0D, value));
     }
 
     static {
@@ -47,7 +54,8 @@ public class CPConfigs extends SimpleConfigs {
         tabs = new ArrayList<>();
 
         MiscSettings = List.of(
-                previewScale
+                previewScale,
+                previewAlpha
         );
 
         Total.addAll(MiscSettings);
