@@ -47,7 +47,7 @@ loom {
         runConfigs.named("client").get().getVmArgs().remove("-XstartOnFirstThread")
     }
 
-    accessWidenerPath = file("src/main/resources/containerpreview.accessWidener")
+    accessWidenerPath = file("src/main/resources/containerpreview.accesswidener")
 
     mergedMinecraftJar()
 
